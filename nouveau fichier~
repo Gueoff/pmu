@@ -1,0 +1,26 @@
+pour une course, il y a au moins 2 dialogues entre le client et le serveur. Le client 
+commence par envoyer une structure User définie telle que :
+
+struct user{
+login,
+password;
+}
+
+Le serveur écoute le socket et récupère ce user.
+Les 4 clients devront envoyer cette structure au client qui éxecutera une fonction de 
+connexion qui prend en parametre un login et un mot de passe. Cette fonction lit dans un fichier texte, se place à la ligne où le login est égal à celui rentré puis regarde si les mots de passes sont identiques. S'ils le sont alors la connexion a réussie et renvoie true, sinon on va éxecuter une fonction d'inscription qui va écrire dans ce même fichier les informations telles que :
+
+login#password#1000
+
+le login reçu et crypté
+le password reçu et crypté
+l'argent de base (1000) que l'on attribut au joueur
+
+Une fois à ce stade, le serveur attend que les 4 joueurs soient connecté, donc que les 4 threads soient stockés dans le serveur. Dès que les quatrième joueur est connecté, le serveur renvoie une trame avec les informations suivantes :
+
+une course
+un numéro de socket
+un token
+
+
+La course sert au client pour savoir sur quel cheval parier, le numéro de socket sert à savoir avec quel client dialoguer et le token sert à savoir à quel stade nous sommes.

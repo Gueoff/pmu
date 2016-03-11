@@ -1,0 +1,18 @@
+client             serveur
+
+------user---------->
+
+                     while(user != 4){
+<-----wait-----------
+		     }
+<-----trame----------
+
+------pari----------->
+		    while(pari != 4){
+<-----wait-----------
+		     }
+		     course
+		     modification fichier
+<-----trame----------
+
+------deco---------->
