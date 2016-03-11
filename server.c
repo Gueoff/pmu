@@ -314,6 +314,8 @@ void* threadCourse (void *arg) {
     Pari paris[TAILLE_MAX_CLIENTS];
     User user;
     int compteur = 0;
+    fd_set readfs;
+
 
     //Init de la course pour les TAILLE_MAX_CLIENTS clients
     for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
@@ -328,6 +330,27 @@ void* threadCourse (void *arg) {
 
     while(1)
     {
+/*
+   //Timeout
+   int ret = 0;
+   FD_ZERO(&readfs);
+   FD_SET(renvoi.trames[compteur].sock, &readfs);
+   struct timeval tv;
+
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
+
+   if((ret = select(renvoi.trames[compteur].sock , &readfs, NULL, NULL, &tv)) < 0)
+   {
+      perror("select()");
+     // exit(errno);
+   }
+
+
+   //Traitement des donnees
+   if((FD_ISSET(renvoi.trames[compteur].sock, &readfs)) || ret == 0)
+   {*/
+
 
 	//Prise en charge d'un pari -- token reçu = 1 -- token envoyé = 2 || 0
 	if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
@@ -344,7 +367,7 @@ void* threadCourse (void *arg) {
 	}
 
 	//Debut course
-        else{
+        else if(compteur == TAILLE_MAX_CLIENTS ){
            printf("Tous les paris ont été reçus\n");
 
 	   //Lancement de la course
@@ -366,6 +389,8 @@ void* threadCourse (void *arg) {
 	 
 	    pthread_exit(NULL);
         } 
+
+//}
 
 
     }//Fin while
