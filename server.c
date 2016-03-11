@@ -12,6 +12,7 @@ Serveur à lancer avant le client
 #include <time.h>
 #define TAILLE_MAX_NOM 256
 #define TAILLE_MAX_USER 256
+#define TAILLE_MAX_CLIENTS 2
 
 
 
@@ -50,7 +51,7 @@ typedef struct Pari{
 } Pari;
 
 typedef struct Partie{
-	Trame trames[2];
+	Trame trames[TAILLE_MAX_CLIENTS];
 } Partie;
 
 
@@ -92,7 +93,6 @@ int inscription(char* login, char* password){
 		if(compare(login, champ) == 0) //Login égaux
 		{
 		    printf("utilisateur déjà existant\n");
-		    //exit(1);
 		}
    	    }
 	}
@@ -100,7 +100,7 @@ int inscription(char* login, char* password){
     }
     else
     {
-        printf("Impossible d'ouvrir le fichier");
+        printf("Impossible d'ouvrir le fichier\n");
     }
 
 
@@ -113,7 +113,7 @@ int inscription(char* login, char* password){
     }
     else
     {
-        printf("Impossible d'ouvrir le fichier");
+        printf("Impossible d'ouvrir le fichier\n");
     }
 return 0;
 }
@@ -141,7 +141,6 @@ bool connection(User user){
 		    champ = strtok(NULL, "#");
 	    	    if(compare(password, champ) == 0) //Password égaux
     	    	    {
-    			printf("connection réussie\n");
 			return true;
    	            }
 		}
@@ -151,7 +150,7 @@ bool connection(User user){
     }
     else
     {
-        printf("Impossible d'ouvrir le fichier");
+        printf("Impossible d'ouvrir le fichier\n");
     }
     return false;
 }
@@ -203,7 +202,7 @@ Course init(){
 
 /*------------------------------------------------------*/
 Course lancer(Course course){
-        srand(time(NULL));//Pour l'al??atoire
+        srand(time(NULL));
 
         Cheval c1 = course.chevaux[0];
         Cheval c2 = course.chevaux[1]; 
@@ -218,8 +217,6 @@ Course lancer(Course course){
         float p4 = c4.cote * (rand()%20) * 3;
         float p5 = c5.cote * (rand()%20) * 3;
         float p6 = c6.cote * (rand()%20) * 3;
-
-        //TODO: a remplacer par un algorithme de tri
         
         float tabCote[6]={p1,p2,p3,p4,p5,p6};
         Cheval tabChevaux[6]={c1,c2,c3,c4,c5,c6};
@@ -229,11 +226,11 @@ Course lancer(Course course){
                 
                 for(int j = 0 ;j<i-1;++j){
                         if (tabCote[j+i] < tabCote[j]){
-                                //----------------------------- ??change dans cote
+                                //----------------------------- echange dans cote
                                 tempCote = tabCote[j+1];
                                 tabCote[j+1] = tabCote[j];
                                 tabCote[j] = tempCote;
-                                //----------------------------- ??change dans cheval
+                                //----------------------------- echange dans cheval
                                 tempChevaux = tabChevaux[j+1];
                                 tabChevaux[j+1] = tabChevaux[j];
                                 tabChevaux [j] = tempChevaux;
@@ -258,7 +255,7 @@ void modificationArgent(Course course, Pari pari, User user){
     FILE* fichier = NULL;
     fichier = fopen("user.txt", "r+");
     float montant = 0;
-float argent;
+    float argent;
 
     //Course gagnée
     if(course.chevaux[0].numero == pari.num_cheval)
@@ -309,68 +306,70 @@ float argent;
 /*------------------------------------------------------*/
 void* threadCourse (void *arg) {
 
-printf("dans le thread course\n");
     Partie* partie = (Partie*) arg; //partie reçu
     Partie renvoi = *partie; //partie à renvoyer
 
-    //Init de la course pour les x clients
-    for(int i = 0; i<2; i++){
-        renvoi.trames[i].course = init();
-    }
-
-
-    printf("=== %d\n", renvoi.trames[1].sock);
     int longueur;
     Pari pari;
+    Pari paris[TAILLE_MAX_CLIENTS];
     User user;
+    int compteur = 0;
 
-    //Envoie init de la course
-    for(int i = 0; i<2; i++){
+    //Init de la course pour les TAILLE_MAX_CLIENTS clients
+    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+        renvoi.trames[i].course = init();
+	renvoi.trames[i].token = 1;
+    }
+
+    //Envoie init de la course aux clients
+    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
         write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
     }
 
-/*
     while(1)
     {
+
 	//Prise en charge d'un pari -- token reçu = 1 -- token envoyé = 2 || 0
-	if (renvoi.token == 1 && (longueur = read(renvoi.sock, &pari, sizeof(pari))) > 0){
-	    trame->compteur++; 
-            printf("le compteur est à %d\n", trame->compteur);
+	if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
+	    paris[compteur] = pari;
+	    compteur++; 
+            printf("en attente de %d joueurs\n", TAILLE_MAX_CLIENTS-compteur);
 	}
 
 
 	//Renvoie de l'attente au client
-
-	if(trame->compteur > 40){
-	    renvoi.token = 0;
-	    renvoi.compteur = trame->compteur;
-	    write(renvoi.sock, &renvoi, sizeof(renvoi));
-	    sleep(5);
+	if(compteur < TAILLE_MAX_CLIENTS){
+	    renvoi.trames[compteur-1].token = 0;
+	    write(renvoi.trames[compteur-1].sock, &renvoi.trames[compteur-1], sizeof(renvoi.trames[compteur-1]));
 	}
 
-
-
-	//Thread debut course
-        //else{
+	//Debut course
+        else{
            printf("Tous les paris ont été reçus\n");
 
 	   //Lancement de la course
-	    Course resultat = lancer(renvoi.course);
-	    renvoi.course = resultat;
+	    Course resultat = lancer(renvoi.trames[0].course);
 
-	    //Modification de l'argent des users
-	    modificationArgent(resultat, pari, renvoi.user);
+    	    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+                renvoi.trames[i].course = resultat;
+	        renvoi.trames[i].token = 2;
 
-	    //Renvoie du resultat
-	    renvoi.token = 2;
-	    write(renvoi.sock, &renvoi, sizeof(renvoi));
+		//Modification de l'argent des users
+	        modificationArgent(resultat, paris[i], renvoi.trames[i].user);
+    	    }
 
+
+	    //Renvoie du resultat aux clients
+   	    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+        	write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
+    	    }
+	 
 	    pthread_exit(NULL);
-        //} 
+        } 
 
 
     }//Fin while
-*/
+
 
 
 }
@@ -402,37 +401,23 @@ void* threadCompteur (void *arg) {
 	    }
 	renvoi.user = user;
         trame->compteur++; 
-        printf("le compteur est à %d\n", trame->compteur);
 	}
 
-	
-
 	//Renvoie de l'attente au client
-	if(trame->compteur < 2){
+	if(trame->compteur < TAILLE_MAX_CLIENTS){
 	    renvoi.token = 0;
 	    renvoi.compteur = trame->compteur;
 	    write(renvoi.sock, &renvoi, sizeof(renvoi));
 	    sleep(5);
 	}
 
-	//Thread init course
-
+	//On lance la course 
         else{
            printf("Tous les joueurs sont dans la partie\n");
-	   //renvoi.token = 1;
-	   //renvoi.compteur = 0;
-
-	   //pthread_t init;
-	   //pthread_create(&init, NULL, threadCourse, &renvoi);
 	   pthread_exit(NULL);
         } 
 
-
     }//Fin while
-
-    printf("fin premier thread\n");
-
-
 }
 
 
@@ -536,13 +521,10 @@ int main(int argc, char **argv) {
 			exit(1);	
 		}
 		else{
-		    printf("un nouveau joueur est arrivé\n");
 		    partie.trames[compteur] = trame;
-		    printf("on incremente le compteur qui etait de %d\n",compteur);
 		    compteur ++;
-		    printf("et qui passe a %d\n",compteur);
 
-		    if(compteur%2 == 0){
+		    if(compteur%TAILLE_MAX_CLIENTS == 0){
 			pthread_t init;
 			if (thread_client = pthread_create(&init, NULL, threadCourse, &partie) != 0 ){
 				printf("Erreur lors de la création du thread \n");
@@ -552,10 +534,7 @@ int main(int argc, char **argv) {
 			    printf("creation thread course\n");
 			    compteur = 0;
 			}
-			
 		    }
-
-
 		}
 
 		
