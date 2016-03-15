@@ -77,9 +77,9 @@ int compare(const char* chaine1, const char* chaine2)
     {
          
         if(*chaine1 != *chaine2)
-                {
+        {
             vrai = 1;
-            }
+        }
       chaine1++;
       chaine2++;
     }
@@ -398,8 +398,12 @@ void modificationArgent(Course course, Pari pari, User user){
     char chaine[TAILLE_MAX_USER] = "";
     FILE* fichier = NULL;
     fichier = fopen("user.txt", "r+");
+    FILE* tmp = NULL;
+    tmp = fopen("tmp.txt", "w+");
     float montant = 0;
     float argent;
+    User read;
+    int montant_tmp = 0;
 
     //Course gagnée
     if(course.chevaux[0].numero == pari.num_cheval)
@@ -427,124 +431,121 @@ void modificationArgent(Course course, Pari pari, User user){
 	    	    if(compare(password, champ) == 0) //Password égaux
     	    	    {
 			champ = strtok(NULL, "#");
-			montant = atoi(champ) + montant;
-
-			fprintf(fichier, "%s#%s#%f\n", login, password,montant);
+			    montant = atof(champ) + montant;
+printf("%s#%s#%f\n", read.login, read.password, montant);
+        		    fprintf(tmp, "%s#%s#%f\n", login, password,montant);
+    			
 		
    	            }
 		}
+		//Autre user
+		else{
+		    strcpy(read.login,champ);
+		    champ = strtok(NULL, "#");
+		    strcpy(read.password,champ);
+		    champ = strtok(NULL, "#");
+		    montant_tmp = atof(champ);
+//printf("%s#%s#%f\n", read.login, read.password, montant_tmp);
+		    fprintf(tmp,"%s#%s#%f\n", read.login, read.password, montant_tmp);
+		}
    	    }
 	}
-	fclose(fichier); 
+	fclose(fichier);
+	remove ("user.txt");
+	rename("tmp.txt","user.txt");
+	fclose(tmp);
+	
+	
     }
     else
     {
-        printf("Impossible d'ouvrir le fichier");
+        printf("Impossible d'ouvrir le fichier\n");
     }
 
 }
 
 
-/*------------------------------------------------------*/
+/**
+ *\brief fonction lançant une course et la retourne à tous les clients.
+ *\param[in] partie Une salle de jeu contenant x clients représentés par des trames.
+ *\reçoit les paris des clients, attend que tous les clients aient pariés, lance la course et renvoi le résultat.
+**/
 void* threadCourse (void *arg) {
 
-    Partie* partie = (Partie*) arg; //partie reçu
-    Partie renvoi = *partie; //partie à renvoyer
+	Partie* partie = (Partie*) arg; //partie reçu
+	Partie renvoi = *partie; //partie à renvoyer
 
-    int longueur;
-    Pari pari;
-    Pari paris[TAILLE_MAX_CLIENTS];
-    User user;
-    int compteur = 0;
-    fd_set readfs;
+	int longueur;
+	Pari pari;
+	Pari paris[TAILLE_MAX_CLIENTS];
+	User user;
+ 	int compteur = 0;
 
-    Course course = init();
-    //Init de la course pour les TAILLE_MAX_CLIENTS clients
-    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        renvoi.trames[i].course = course;
-	renvoi.trames[i].token = 1;
-    }
+	Course course = init();
+	//Init de la course pour les TAILLE_MAX_CLIENTS clients
+	for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+        	renvoi.trames[i].course = course;
+		renvoi.trames[i].token = 1;
+    	}
 
-    //Envoie init de la course aux clients
-    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        if( (write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]))) > 0){
+    	//Envoie init de la course aux clients
+    	for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+        	if( (write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]))) > 0){
 
-	}
-	else{
-	    printf("echec lors de l'envoi de la trame\n");
-	}
-    }
+		}
+		else{
+	    		printf("echec lors de l'envoi de la trame\n");
+		}
+    	}
 
-    while(1)
-    {
-/*
-   //Timeout
-   int ret = 0;
-   FD_ZERO(&readfs);
-   FD_SET(renvoi.trames[compteur].sock, &readfs);
-   struct timeval tv;
+    	while(1)
+    	{
 
-    tv.tv_sec = 5;
-    tv.tv_usec = 0;
-
-   if((ret = select(renvoi.trames[compteur].sock , &readfs, NULL, NULL, &tv)) < 0)
-   {
-      perror("select()");
-     // exit(errno);
-   }
+		//Prise en charge d'un pari -- token reçu = 1 -- token envoyé = 2 || 0
+		if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
+	    		paris[compteur] = pari;
+	    		compteur++; 
+         		printf("en attente de %d paris\n", TAILLE_MAX_CLIENTS-compteur);
+		}
 
 
-   //Traitement des donnees
-   if((FD_ISSET(renvoi.trames[compteur].sock, &readfs)) || ret == 0)
-   {*/
+		//Renvoie de l'attente au client
+		if(compteur < TAILLE_MAX_CLIENTS){
+	 	   	renvoi.trames[compteur-1].token = 0;
+	 	   	write(renvoi.trames[compteur-1].sock, &renvoi.trames[compteur-1], sizeof(renvoi.trames[compteur-1]));
+		}
 
+		//Debut course
+       		else if(compteur == TAILLE_MAX_CLIENTS ){
+           		printf("Tous les paris ont été reçus\n");
 
-	//Prise en charge d'un pari -- token reçu = 1 -- token envoyé = 2 || 0
-	if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
-	    paris[compteur] = pari;
-	    compteur++; 
-            printf("en attente de %d paris\n", TAILLE_MAX_CLIENTS-compteur);
-	}
+	   		//Lancement de la course
+	    		Course resultat = lancer(renvoi.trames[0].course);
 
+    	    		for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
+               			renvoi.trames[i].course = resultat;
+	        		renvoi.trames[i].token = 2;
 
-	//Renvoie de l'attente au client
-	if(compteur < TAILLE_MAX_CLIENTS){
-	    renvoi.trames[compteur-1].token = 0;
-	    write(renvoi.trames[compteur-1].sock, &renvoi.trames[compteur-1], sizeof(renvoi.trames[compteur-1]));
-	}
+				//Modification de l'argent des users
+	        		modificationArgent(resultat, paris[i], renvoi.trames[i].user);
 
-	//Debut course
-        else if(compteur == TAILLE_MAX_CLIENTS ){
-           printf("Tous les paris ont été reçus\n");
+				//Renvoie du resultat aux clients
+				write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
+    	    		}
 
-	   //Lancement de la course
-	    Course resultat = lancer(renvoi.trames[0].course);
+	    		printf("Course finie, deconnexion des utilisateurs...\n");
+	    		pthread_exit(NULL);
+        	} 
 
-    	    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-                renvoi.trames[i].course = resultat;
-	        renvoi.trames[i].token = 2;
-
-		//Modification de l'argent des users
-	        modificationArgent(resultat, paris[i], renvoi.trames[i].user);
-
-		//Renvoie du resultat aux clients
-		write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
-    	    }
-
-	    printf("Course finie, deconnexion des utilisateurs...\n");
-	    pthread_exit(NULL);
-        } 
-
-//}
-
-
-    }//Fin while
-
-
+    	}//Fin while
 
 }
 
-/*------------------------------------------------------*/
+/**
+ *\brief fonction permetant la connection et l'inscription des clients.
+ *\param[in] trame la trame reçue par un client.
+ *\reçoit u enstructure user d'un client, le connecte ou l'inscrit selon s'il existe déjà puis lui renvoi une trame d'attente.
+**/
 void* threadCompteur (void *arg) {
 
     Trame* trame = (Trame*) arg; //trame reçu
@@ -570,6 +571,7 @@ void* threadCompteur (void *arg) {
 	        printf("Vous êtes maintenant inscrit\n");
 	    }
 	renvoi.user = user;
+	trame->user = user;
         trame->compteur++; 
 	}
 
