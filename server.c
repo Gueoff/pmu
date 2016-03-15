@@ -1,6 +1,14 @@
-/*----------------------------------------------
-Serveur à lancer avant le client
-------------------------------------------------*/
+/**
+ * \file server.c
+ * \brief Serveur PMU
+ * \author Geoffrey DESBROSSES, Ugo MAHEY
+ * \version 1
+ * \date 15 mars 2016
+ *
+ * Serveur servant à gérr les paris et lancer des courses de chevaux
+ *
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <linux/types.h> 	/* pour les sockets */
@@ -55,7 +63,12 @@ typedef struct Partie{
 } Partie;
 
 
-/*------------------------------------------------------*/
+/**
+ *\brief Fonction qui compare deux chaine e caractère pour voir si elles sont identiques;
+ *\param[in] chaine1 la premiere chaine à comparer.
+ *\param[in] chaine2 la deuxieme chaine à comparer.
+ *\return 1 si les chaines sont égales, 0 sinon.
+**/
 int compare(const char* chaine1, const char* chaine2)
 {
     int vrai = 0;
@@ -73,7 +86,12 @@ int compare(const char* chaine1, const char* chaine2)
     return vrai;
 }
 
-/*------------------------------------------------------*/
+/**
+ *\brief Fonction qui écrit dans un fichier texte si l'utilisateur n'existe pas.
+ *\param[in] login le login de l'utilisateur à inscrire.
+ *\param[in] password le mot de passe de l'utilisateur à inscrire.
+ *\return 0.
+**/
 int inscription(char* login, char* password){
     char chaine[TAILLE_MAX_USER] = "";
     FILE* fichier = NULL;
@@ -117,7 +135,13 @@ int inscription(char* login, char* password){
     }
 return 0;
 }
-/*------------------------------------------------------*/
+
+
+/**
+ *\brief Fonction qui lis dans un fichier texte et recherche l'utilisateur rentré en parametre.
+ *\param[in] user l'utilisateur à rechercher dans le fichier.
+ *\return true si l'utilisateur existe, false sinon.
+**/
 bool connection(User user){
 
     char* login = user.login;
@@ -155,39 +179,148 @@ bool connection(User user){
     return false;
 }
 
-/*------------------------------------------------------*/
+/**
+ *\brief Fonction qui initialise une course de chevaux.
+ *\Lis dans un fichier texte pour récupérer 6 chevaux aléatoirement.
+ *\return la course initialisée.
+**/
 Course init(){
+ 	srand(time(NULL));
+	int nb = 0;
+	int compteur = 0;
+	int numero1 = 0;
+	int numero2 = 0;
+	int numero3 = 0;
+	int numero4 = 0;
+	int numero5 = 0;
+	int numero6 = 0;
 	Cheval c1;
 	Cheval c2;
 	Cheval c3;
 	Cheval c4;
 	Cheval c5;
-	Cheval c6;	
+	Cheval c6;
+
+
+
+    char chaine[TAILLE_MAX_USER] = "";
+    FILE* fichier = NULL;
+    fichier = fopen("ecurie.txt", "r");
+
+    if (fichier != NULL)
+    {
+	//On récupère le nombre de chevaux disponibles
+	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
+	{
+	    nb++;
+	}
+	fclose(fichier);
+
+	//On veut 6 chevaux différents
+	numero1 = (rand()%nb);
+	while(numero2 == numero1){
+	    numero2 = (rand()%nb);
+	}
+	while(numero3 == numero1 || numero3 == numero2){
+	    numero3 = (rand()%nb);
+	}
+	while(numero4 == numero1 || numero4 == numero2 || numero4 == numero3){
+	    numero4 = (rand()%nb);
+	}
+	while(numero5 == numero1 || numero5 == numero2 || numero5 == numero3 || numero5 == numero4){
+	    numero5 = (rand()%nb);
+	}
+	while(numero6 == numero1 || numero6 == numero2 || numero6 == numero3 || numero6 == numero4 || numero6 == numero5){
+	    numero6 = (rand()%nb);
+	}	
+
+	//On initialise les chevaux à partir du fichier texte
+	char *champ;
+	fichier = fopen("ecurie.txt", "r");
+	printf("\n\n");
+	while (compteur != nb)
+	{
+	    if(compteur == numero1){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c1.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c1.cote = atof(champ);
+		     c1.numero = 1;
+		     printf("Cheval %d : %s\n",c1.numero, c1.nom);
+		}
+	    }
+	    if(compteur == numero2){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c2.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c2.cote = atof(champ);
+		     c2.numero = 2;
+		     printf("Cheval %d : %s\n",c2.numero, c2.nom);
+		}
+	    }
+	    if(compteur == numero3){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c3.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c3.cote = atof(champ);
+		     c3.numero = 3;
+		     printf("Cheval %d : %s\n",c3.numero, c3.nom);
+		}
+	    }
+	    if(compteur == numero4){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c4.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c4.cote = atof(champ);
+		     c4.numero = 4;
+		     printf("Cheval %d : %s\n",c4.numero, c4.nom);
+		}
+	    }
+	    if(compteur == numero5){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c5.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c5.cote = atof(champ);
+		     c5.numero = 5;
+		     printf("Cheval %d : %s\n",c5.numero, c5.nom);
+		}
+	    }
+	    if(compteur == numero6){
+		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    	champ = strtok(chaine, "#");
+		if(champ){
+		     strcpy(c6.nom,champ);
+		     champ = strtok(NULL, "#");
+		     c6.cote = atof(champ);
+		     c6.numero = 6;
+		     printf("Cheval %d : %s\n",c6.numero, c6.nom);
+		}
+	    }
+
+	    compteur++;
+   
+	}
+	printf("\n\n");
+	fclose(fichier); 
+    }
+    else
+    {
+        printf("Impossible d'ouvrir le fichier\n");
+    }
 	
-	strcpy(c1.nom,"speedy");
-	c1.numero = 10;
-	c1.cote = 1.5;
 
-	strcpy(c2.nom,"yeham");
-	c2.numero = 2;
-	c2.cote = 2.85;
 
-	strcpy(c3.nom,"gueoff");
-	c3.numero = 3;
-	c3.cote = 3;
-
-	strcpy(c4.nom,"tornado");
-	c4.numero = 4;
-	c4.cote = 1.3;
-
-	strcpy(c5.nom,"noisette");
-	c5.numero = 5;
-	c5.cote = 1.8;
-
-	strcpy(c6.nom,"dormeur");
-	c6.numero = 6;
-	c6.cote = 0.5;
-	
+	//Création de la course
 	Course course;
 	course.chevaux[0] = c1;
 	course.chevaux[1] = c2; 
@@ -200,7 +333,12 @@ Course init(){
 }
 
 
-/*------------------------------------------------------*/
+/**
+ *\brief Fonction qui lance une course.
+ *\param[in] course la course à lancer.
+ *\Change l'ordre de la course pour savoir l'ordre d'arrivée des chevaux
+ *\return la course à l'arrivée.
+**/
 Course lancer(Course course){
         srand(time(NULL));
 
@@ -246,7 +384,13 @@ Course lancer(Course course){
         return resultat;
 }
 
-/*------------------------------------------------------*/
+
+/**
+ * Modifie l'argent d'un utilisateur après lancement de la course.
+ * param[in] course le résultat de la course.
+ * param[in] pari le pari de la course.
+ * param[in] user l'utilisateur qui a parié.
+**/
 void modificationArgent(Course course, Pari pari, User user){
 
     char* login = user.login;
@@ -260,12 +404,10 @@ void modificationArgent(Course course, Pari pari, User user){
     //Course gagnée
     if(course.chevaux[0].numero == pari.num_cheval)
     {
-	printf("felicitations !\n");
 	montant = pari.argent + pari.argent * course.chevaux[0].cote;
     }
     else
     {
-	printf("dommage !\n");
 	montant = -pari.argent;
     }
 
@@ -316,16 +458,21 @@ void* threadCourse (void *arg) {
     int compteur = 0;
     fd_set readfs;
 
-
+    Course course = init();
     //Init de la course pour les TAILLE_MAX_CLIENTS clients
     for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        renvoi.trames[i].course = init();
+        renvoi.trames[i].course = course;
 	renvoi.trames[i].token = 1;
     }
 
     //Envoie init de la course aux clients
     for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
+        if( (write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]))) > 0){
+
+	}
+	else{
+	    printf("echec lors de l'envoi de la trame\n");
+	}
     }
 
     while(1)
@@ -356,7 +503,7 @@ void* threadCourse (void *arg) {
 	if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
 	    paris[compteur] = pari;
 	    compteur++; 
-            printf("en attente de %d joueurs\n", TAILLE_MAX_CLIENTS-compteur);
+            printf("en attente de %d paris\n", TAILLE_MAX_CLIENTS-compteur);
 	}
 
 
@@ -379,14 +526,12 @@ void* threadCourse (void *arg) {
 
 		//Modification de l'argent des users
 	        modificationArgent(resultat, paris[i], renvoi.trames[i].user);
+
+		//Renvoie du resultat aux clients
+		write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
     	    }
 
-
-	    //Renvoie du resultat aux clients
-   	    for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        	write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
-    	    }
-	 
+	    printf("Course finie, deconnexion des utilisateurs...\n");
 	    pthread_exit(NULL);
         } 
 
@@ -556,7 +701,6 @@ int main(int argc, char **argv) {
 				exit(1);	
 			}
 			else{
-			    printf("creation thread course\n");
 			    compteur = 0;
 			}
 		    }

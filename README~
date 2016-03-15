@@ -1,0 +1,15 @@
+Commandes pour compiler le serveur et le lancer:
+
+gcc -o server server.c -pthread -std=gnu99 -w
+./server
+
+
+Commandes pour compiler le client :
+gcc -o client.c client
+
+Lancer le client en faisant:
+./client <login> <mot_de_passe>
+
+Modifier le nombre de client minimum pour lancer une course en changeant la macro TAILLE_MAX_CLIENTS du serveur.
+  
+

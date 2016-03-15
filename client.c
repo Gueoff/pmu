@@ -64,46 +64,59 @@ void init(Course course){
 	printf("------------------------\n");
 	printf("numero : %d\n",c1.numero);
 	printf("nom : %s\n",c1.nom);
-	printf("côte : %f\n",c1.cote);
+	printf("cote : %f\n",c1.cote);
 	printf("------------------------\n");
 	printf("numero : %d\n",c2.numero);
 	printf("nom : %s\n",c2.nom);
-	printf("côte : %f\n",c2.cote);
+	printf("cote : %f\n",c2.cote);
 	printf("------------------------\n");
 	printf("numero : %d\n",c3.numero);
 	printf("nom : %s\n",c3.nom);
-	printf("côte : %f\n",c3.cote);
+	printf("cote : %f\n",c3.cote);
 	printf("------------------------\n");
 	printf("numero : %d\n",c4.numero);
 	printf("nom : %s\n",c4.nom);
-	printf("côte : %f\n",c4.cote);
+	printf("cote : %f\n",c4.cote);
 	printf("------------------------\n");
 	printf("numero : %d\n",c5.numero);
 	printf("nom : %s\n",c5.nom);
-	printf("côte : %f\n",c5.cote);
+	printf("cote : %f\n",c5.cote);
 	printf("------------------------\n");
 	printf("numero : %d\n",c6.numero);
 	printf("nom : %s\n",c6.nom);
-	printf("côte : %f\n",c6.cote);
+	printf("cote : %f\n",c6.cote);
 }
 
 int parier(int socket){
     Pari pari;
     printf("Sur quel cheval voulez-vous parier ? (numéro du cheval attendu)\n");
     scanf("%d", &pari.num_cheval);
+
+    while(pari.num_cheval < 1 || pari.num_cheval > 6){
+	printf("Erreur, rechoisissez un numero de cheval\n");
+	scanf("%d", &pari.num_cheval);
+    }
+
+
     printf("Combien voulez-vous parier sur le cheval numero %d ?\n", pari.num_cheval);
     scanf("%d", &pari.argent);
+
+    while(pari.argent < 1 ){
+	printf("Erreur, Misez au moins 1€\n");
+	scanf("%d", &pari.num_cheval);
+    }
+
     printf("Pari lancé : %d € sur le cheval %d\n", pari.argent, pari.num_cheval);
 
-    printf("envoi du pari sur la socket numero %d\n", socket);
+    int numero = pari.num_cheval;
 
     if ((write(socket, &pari, sizeof(pari))) > 0) {
-       return 1;
+       return numero;
     }
 return 0;
 }
 
-void resultat(Course course){
+void resultat(Course course, int numero){
 	Cheval c1 = course.chevaux[0];
 	Cheval c2 = course.chevaux[1];
 	Cheval c3 = course.chevaux[2];
@@ -123,6 +136,13 @@ void resultat(Course course){
 	printf("cinquieme : %s\n",c5.nom);
 	printf("------------------------\n");
 	printf("sixieme : %s\n",c6.nom);
+	printf("------------------------\n");
+
+	if(numero != c1.numero){
+	    printf("Vous avez PERDU\n");
+	}else{
+	    printf("Vous avez GAGNE\n");
+	}
 }
 
 
@@ -131,7 +151,8 @@ int main(int argc, char **argv) {
   
     int         socket_descriptor,         /* descripteur de socket */
                 longueur,                 /* longueur d'un buffer utilis?? */
-		etat;
+		etat,
+		numero;
     sockaddr_in adresse_locale;         /* adresse de socket local */
     hostent *        ptr_host;                 /* info sur une machine hote */
     servent *        ptr_service;                 /* info sur service */
@@ -227,7 +248,8 @@ sizeof(adresse_locale))) < 0) {
 	    printf("conditions de la course : \n");
 	    init(trame.course);
 
-	    if(parier(socket_descriptor) == 1){
+	    numero = parier(socket_descriptor);
+	    if(numero != 0){
 	        printf("pari envoyé au serveur\n");
 	        etat = 1;
 	    }
@@ -236,7 +258,7 @@ sizeof(adresse_locale))) < 0) {
         else if(trame.token == 2){
 	    // resultat de la course
 	    printf("resultat de la course : \n");
-	    resultat(trame.course);
+	    resultat(trame.course, numero);
 	    etat = 2;
     	}
 
@@ -245,9 +267,8 @@ sizeof(adresse_locale))) < 0) {
 }//fin while
 
 	if(etat == 2){
-	    printf("\nfin de la reception.\n");
+	    printf("\nDeconnexion.\n");
     	    close(socket_descriptor);
-    	    printf("connexion avec le serveur fermee, fin du programme.\n");
 	}
     
 
