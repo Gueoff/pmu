@@ -11,5 +11,4 @@ Lancer le client en faisant:
 ./client <login> <mot_de_passe>
 
 Modifier le nombre de client minimum pour lancer une course en changeant la macro TAILLE_MAX_CLIENTS du serveur.
-  
-
+ 
