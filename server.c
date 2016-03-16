@@ -20,7 +20,7 @@
 #include <time.h>
 #define TAILLE_MAX_NOM 256
 #define TAILLE_MAX_USER 256
-#define TAILLE_MAX_CLIENTS 2
+#define TAILLE_MAX_CLIENTS 1
 
 
 
@@ -103,7 +103,6 @@ int inscription(char* login, char* password){
 
 	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
 	{
-            fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    champ = strtok(chaine, "#");
 
 	    if(champ)
@@ -155,7 +154,6 @@ bool connection(User user){
 	char *champ;
 	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
 	{
-            fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    champ = strtok(chaine, "#");
 
 	    if(champ)
@@ -240,8 +238,8 @@ Course init(){
 	printf("\n\n");
 	while (compteur != nb)
 	{
+	    fgets(chaine, TAILLE_MAX_USER, fichier);
 	    if(compteur == numero1){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c1.nom,champ);
@@ -252,7 +250,6 @@ Course init(){
 		}
 	    }
 	    if(compteur == numero2){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c2.nom,champ);
@@ -262,8 +259,7 @@ Course init(){
 		     printf("Cheval %d : %s\n",c2.numero, c2.nom);
 		}
 	    }
-	    if(compteur == numero3){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    if(compteur == numero3){ 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c3.nom,champ);
@@ -274,7 +270,6 @@ Course init(){
 		}
 	    }
 	    if(compteur == numero4){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c4.nom,champ);
@@ -284,8 +279,7 @@ Course init(){
 		     printf("Cheval %d : %s\n",c4.numero, c4.nom);
 		}
 	    }
-	    if(compteur == numero5){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
+	    if(compteur == numero5){ 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c5.nom,champ);
@@ -296,7 +290,6 @@ Course init(){
 		}
 	    }
 	    if(compteur == numero6){
-		fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    	champ = strtok(chaine, "#");
 		if(champ){
 		     strcpy(c6.nom,champ);
@@ -403,7 +396,7 @@ void modificationArgent(Course course, Pari pari, User user){
     float montant = 0;
     float argent;
     User read;
-    int montant_tmp = 0;
+    float montant_tmp = 0;
 
     //Course gagnée
     if(course.chevaux[0].numero == pari.num_cheval)
@@ -418,9 +411,9 @@ void modificationArgent(Course course, Pari pari, User user){
    if (fichier != NULL)
     {
 	char *champ;
+	fichier = fopen("user.txt", "r+");
 	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
 	{
-            fgets(chaine, TAILLE_MAX_USER, fichier); 
 	    champ = strtok(chaine, "#");
 
 	    if(champ)
@@ -431,9 +424,8 @@ void modificationArgent(Course course, Pari pari, User user){
 	    	    if(compare(password, champ) == 0) //Password égaux
     	    	    {
 			champ = strtok(NULL, "#");
-			    montant = atof(champ) + montant;
-printf("%s#%s#%f\n", read.login, read.password, montant);
-        		    fprintf(tmp, "%s#%s#%f\n", login, password,montant);
+			montant = atof(champ) + montant;
+        		fprintf(tmp, "%s#%s#%f\n", login, password,montant);
     			
 		
    	            }
@@ -445,7 +437,6 @@ printf("%s#%s#%f\n", read.login, read.password, montant);
 		    strcpy(read.password,champ);
 		    champ = strtok(NULL, "#");
 		    montant_tmp = atof(champ);
-//printf("%s#%s#%f\n", read.login, read.password, montant_tmp);
 		    fprintf(tmp,"%s#%s#%f\n", read.login, read.password, montant_tmp);
 		}
    	    }
@@ -474,7 +465,6 @@ void* threadCourse (void *arg) {
 
 	Partie* partie = (Partie*) arg; //partie reçu
 	Partie renvoi = *partie; //partie à renvoyer
-
 	int longueur;
 	Pari pari;
 	Pari paris[TAILLE_MAX_CLIENTS];
@@ -563,12 +553,12 @@ void* threadCompteur (void *arg) {
     	if (renvoi.token == -1 && (longueur = read(trame->sock, &user, sizeof(user))) > 0){
 	    //Connexion
 	    if(connection(user)){
-	        printf("connexion du user %s %s\n", user.login, user.password);
+	        printf("connexion de l'utilisateur %s\n", user.login);
     	    }
 	    //Inscription
 	    else{
 	        inscription(user.login, user.password);
-	        printf("Vous êtes maintenant inscrit\n");
+	        printf("Inscription de l'utilisateur %s\n", user.login);
 	    }
 	renvoi.user = user;
 	trame->user = user;
@@ -580,7 +570,7 @@ void* threadCompteur (void *arg) {
 	    renvoi.token = 0;
 	    renvoi.compteur = trame->compteur;
 	    write(renvoi.sock, &renvoi, sizeof(renvoi));
-	    sleep(5);
+	    sleep(3);
 	}
 
 	//On lance la course 
@@ -615,6 +605,7 @@ int main(int argc, char **argv) {
     Trame trame;
     trame.compteur = 0;
     Partie partie;
+    User user;
     
 
     
@@ -687,6 +678,7 @@ int main(int argc, char **argv) {
 
 
 		trame.sock = nouv_socket_descriptor;
+		//trame.user = user;
 		pthread_t attente;
 		if (thread_client = pthread_create(&attente, NULL, threadCompteur, &trame) != 0 ){
 			printf("Erreur lors de la création du thread \n");
