@@ -81,29 +81,39 @@ void init(Course course){
  * @brief parier est une fonction qui sert à envoyer un pari au serveur.
  * Demande à l'utilisateur un numero de cheval entre 1 et 6 puis une somme à parier > 0.
  * @param socket le socket sur laquelle envoyer le pari.
- * @return 1 si le pari est bien envoyé, 0 sinon.
+ * @return le numero du cheval sur lequel on a parié si le pari est bien envoyé, 0 sinon.
  */
 int parier(int socket){
 
     Pari pari;
     printf("Sur quel cheval voulez-vous parier ? (numéro du cheval attendu)\n");
     scanf("%d", &pari.num_cheval);
+    while(pari.num_cheval < 1 || pari.num_cheval > 6){
+	printf("Erreur, rechoisissez un numero de cheval\n");
+	scanf("%d", &pari.num_cheval);
+    }
+
     printf("Combien voulez-vous parier sur le cheval numero %d ?\n", pari.num_cheval);
     scanf("%d", &pari.argent);
+    while(pari.argent < 1 ){
+	printf("Erreur, Misez au moins 1€\n");
+	scanf("%d", &pari.num_cheval);
+    }
 
-
+    int numero = pari.num_cheval;
     if ((write(socket, &pari, sizeof(pari))) > 0) {
         printf("Pari lancé : %d € sur le cheval %d\n", pari.argent, pari.num_cheval);
-        return 1;
+       return numero;
     }
     return 0;
 }
+
 
 /**
  * @brief resultat est une fonction qui affiche le résultat d'une course dans le terminal.
  * @param course la course à afficher.
  */
-void resultat(Course course){
+void resultat(Course course, int numero){
 
     printf("\n------------------------\n");
     printf("premier   : %s\n",course.chevaux[0].nom);
@@ -118,6 +128,12 @@ void resultat(Course course){
     printf("------------------------\n");
     printf("sixieme   : %s\n",course.chevaux[5].nom);
     printf("------------------------\n\n");
+
+    if(numero != course.chevaux[0].numero){
+        printf("Vous avez PERDU\n");
+    }else{
+        printf("Vous avez GAGNE\n");
+    }
 }
 
 
@@ -126,7 +142,8 @@ int main(int argc, char **argv) {
   
     int         socket_descriptor,         /* descripteur de socket */
                 longueur,                 /* longueur d'un buffer utilis?? */
-		etat;
+		etat,
+		numero;
     sockaddr_in adresse_locale;         /* adresse de socket local */
     hostent *        ptr_host;                 /* info sur une machine hote */
     servent *        ptr_service;                 /* info sur service */
@@ -206,19 +223,20 @@ ntohs(adresse_locale.sin_port));
                 printf("en attente de nouveaux joueurs...\n");
                 sleep(3);
             }
-    
+
             if(trame.token == 1){
                 //Visualisation de la course
                 init(trame.course);
                 //Pari sur un cheval
-                if(parier(socket_descriptor) == 1){
+                numero = parier(socket_descriptor);
+                if(numero != 0){
                     etat = 1;
                 }
             }
 
             else if(trame.token == 2){
                 // resultat de la course
-                resultat(trame.course);
+                resultat(trame.course, numero);
                 etat = 2;
             }
         }
@@ -228,6 +246,6 @@ ntohs(adresse_locale.sin_port));
         close(socket_descriptor);
         printf("connexion avec le serveur fermee, fin du programme.\n");
     }
-    
+
     exit(0);  
 }
