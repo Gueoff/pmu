@@ -20,11 +20,7 @@
 #include <time.h>
 #define TAILLE_MAX_NOM 256
 #define TAILLE_MAX_USER 256
-<<<<<<< HEAD
 #define TAILLE_MAX_CLIENTS 4
-=======
-#define TAILLE_MAX_CLIENTS 1
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
 
 
 
@@ -73,30 +69,15 @@ typedef struct Partie{
  *\param[in] chaine2 la deuxieme chaine à comparer.
  *\return 1 si les chaines sont égales, 0 sinon.
 **/
-<<<<<<< HEAD
 int compare(const char* chaine1, const char* chaine2){
-=======
-int compare(const char* chaine1, const char* chaine2)
-{
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     int vrai = 0;
     while(*chaine1 != '\0' || *chaine2 != '\0')
     {
-<<<<<<< HEAD
         if(*chaine1 != *chaine2){
             vrai = 1;
         }
         chaine1++;
         chaine2++;
-=======
-         
-        if(*chaine1 != *chaine2)
-        {
-            vrai = 1;
-        }
-      chaine1++;
-      chaine2++;
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     }
     return vrai;
 }
@@ -112,7 +93,6 @@ int inscription(char* login, char* password){
     FILE* fichier = NULL;
     fichier = fopen("user.txt", "r");
 
-<<<<<<< HEAD
     if (fichier != NULL){
         char *champ;
 
@@ -125,25 +105,6 @@ int inscription(char* login, char* password){
             }
         }
         fclose(fichier);
-=======
-    if (fichier != NULL)
-    {
-	char *champ;
-
-	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
-	{
-	    champ = strtok(chaine, "#");
-
-	    if(champ)
-    	    {
-		if(compare(login, champ) == 0) //Login égaux
-		{
-		    printf("utilisateur déjà existant\n");
-		}
-   	    }
-	}
-	fclose(fichier); 
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     }
     else{
         printf("Impossible d'ouvrir le fichier\n");
@@ -174,7 +135,6 @@ bool connection(User user){
     FILE* fichier = NULL;
     fichier = fopen("user.txt", "r");
 
-<<<<<<< HEAD
     if (fichier != NULL){
         char *champ;
         while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL){
@@ -190,28 +150,6 @@ bool connection(User user){
             }
         }
         fclose(fichier);
-=======
-    if (fichier != NULL)
-    {
-	char *champ;
-	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
-	{
-	    champ = strtok(chaine, "#");
-
-	    if(champ)
-    	    {
-		if(compare(login, champ) == 0) //Login égaux
-		{
-		    champ = strtok(NULL, "#");
-	    	    if(compare(password, champ) == 0) //Password égaux
-    	    	    {
-			return true;
-   	            }
-		}
-   	    }
-	}
-	fclose(fichier); 
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     }
     else{
         printf("Impossible d'ouvrir le fichier\n");
@@ -225,7 +163,6 @@ bool connection(User user){
  *\return la course initialisée.
 **/
 Course init(){
-<<<<<<< HEAD
     srand(time(NULL));
     int nb = 0;
     int compteur = 0;
@@ -241,155 +178,11 @@ Course init(){
     Cheval c4;
     Cheval c5;
     Cheval c6;
-=======
- 	srand(time(NULL));
-	int nb = 0;
-	int compteur = 0;
-	int numero1 = 0;
-	int numero2 = 0;
-	int numero3 = 0;
-	int numero4 = 0;
-	int numero5 = 0;
-	int numero6 = 0;
-	Cheval c1;
-	Cheval c2;
-	Cheval c3;
-	Cheval c4;
-	Cheval c5;
-	Cheval c6;
-
-
 
     char chaine[TAILLE_MAX_USER] = "";
     FILE* fichier = NULL;
     fichier = fopen("ecurie.txt", "r");
 
-    if (fichier != NULL)
-    {
-	//On récupère le nombre de chevaux disponibles
-	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
-	{
-	    nb++;
-	}
-	fclose(fichier);
-
-	//On veut 6 chevaux différents
-	numero1 = (rand()%nb);
-	while(numero2 == numero1){
-	    numero2 = (rand()%nb);
-	}
-	while(numero3 == numero1 || numero3 == numero2){
-	    numero3 = (rand()%nb);
-	}
-	while(numero4 == numero1 || numero4 == numero2 || numero4 == numero3){
-	    numero4 = (rand()%nb);
-	}
-	while(numero5 == numero1 || numero5 == numero2 || numero5 == numero3 || numero5 == numero4){
-	    numero5 = (rand()%nb);
-	}
-	while(numero6 == numero1 || numero6 == numero2 || numero6 == numero3 || numero6 == numero4 || numero6 == numero5){
-	    numero6 = (rand()%nb);
-	}	
-
-	//On initialise les chevaux à partir du fichier texte
-	char *champ;
-	fichier = fopen("ecurie.txt", "r");
-	printf("\n\n");
-	while (compteur != nb)
-	{
-	    fgets(chaine, TAILLE_MAX_USER, fichier);
-	    if(compteur == numero1){
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c1.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c1.cote = atof(champ);
-		     c1.numero = 1;
-		     printf("Cheval %d : %s\n",c1.numero, c1.nom);
-		}
-	    }
-	    if(compteur == numero2){
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c2.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c2.cote = atof(champ);
-		     c2.numero = 2;
-		     printf("Cheval %d : %s\n",c2.numero, c2.nom);
-		}
-	    }
-	    if(compteur == numero3){ 
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c3.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c3.cote = atof(champ);
-		     c3.numero = 3;
-		     printf("Cheval %d : %s\n",c3.numero, c3.nom);
-		}
-	    }
-	    if(compteur == numero4){
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c4.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c4.cote = atof(champ);
-		     c4.numero = 4;
-		     printf("Cheval %d : %s\n",c4.numero, c4.nom);
-		}
-	    }
-	    if(compteur == numero5){ 
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c5.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c5.cote = atof(champ);
-		     c5.numero = 5;
-		     printf("Cheval %d : %s\n",c5.numero, c5.nom);
-		}
-	    }
-	    if(compteur == numero6){
-	    	champ = strtok(chaine, "#");
-		if(champ){
-		     strcpy(c6.nom,champ);
-		     champ = strtok(NULL, "#");
-		     c6.cote = atof(champ);
-		     c6.numero = 6;
-		     printf("Cheval %d : %s\n",c6.numero, c6.nom);
-		}
-	    }
-
-	    compteur++;
-   
-	}
-	printf("\n\n");
-	fclose(fichier); 
-    }
-    else
-    {
-        printf("Impossible d'ouvrir le fichier\n");
-    }
-	
-
-
-	//Création de la course
-	Course course;
-	course.chevaux[0] = c1;
-	course.chevaux[1] = c2; 
-	course.chevaux[2] = c3; 
-	course.chevaux[3] = c4; 
-	course.chevaux[4] = c5; 
-	course.chevaux[5] = c6; 
-	
-	return course;
-}
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
-
-    char chaine[TAILLE_MAX_USER] = "";
-    FILE* fichier = NULL;
-    fichier = fopen("ecurie.txt", "r");
-
-<<<<<<< HEAD
     if (fichier != NULL)
     {
         //On récupère le nombre de chevaux disponibles
@@ -471,48 +264,6 @@ Course init(){
                      c5.cote = atof(champ);
                      c5.numero = 5;
                      printf("Cheval %d : %s\n",c5.numero, c5.nom);
-=======
-/**
- *\brief Fonction qui lance une course.
- *\param[in] course la course à lancer.
- *\Change l'ordre de la course pour savoir l'ordre d'arrivée des chevaux
- *\return la course à l'arrivée.
-**/
-Course lancer(Course course){
-        srand(time(NULL));
-
-        Cheval c1 = course.chevaux[0];
-        Cheval c2 = course.chevaux[1]; 
-        Cheval c3 = course.chevaux[2];
-        Cheval c4 = course.chevaux[3];
-        Cheval c5 = course.chevaux[4];
-        Cheval c6 = course.chevaux[5];
-
-        float p1 = c1.cote * (rand()%20) * 3;
-        float p2 = c2.cote * (rand()%20) * 3;
-        float p3 = c3.cote * (rand()%20) * 3;
-        float p4 = c4.cote * (rand()%20) * 3;
-        float p5 = c5.cote * (rand()%20) * 3;
-        float p6 = c6.cote * (rand()%20) * 3;
-        
-        float tabCote[6]={p1,p2,p3,p4,p5,p6};
-        Cheval tabChevaux[6]={c1,c2,c3,c4,c5,c6};
-        float tempCote;
-        Cheval tempChevaux;
-        for(int i = 5; i>0;--i){
-                
-                for(int j = 0 ;j<i-1;++j){
-                        if (tabCote[j+i] < tabCote[j]){
-                                //----------------------------- echange dans cote
-                                tempCote = tabCote[j+1];
-                                tabCote[j+1] = tabCote[j];
-                                tabCote[j] = tempCote;
-                                //----------------------------- echange dans cheval
-                                tempChevaux = tabChevaux[j+1];
-                                tabChevaux[j+1] = tabChevaux[j];
-                                tabChevaux [j] = tempChevaux;
-                        }
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
                 }
             }
             if(compteur == numero6){
@@ -623,26 +374,15 @@ void modificationArgent(Course course, Pari pari, User user){
     float montant_tmp = 0;
 
     //Course gagnée
-<<<<<<< HEAD
     if(course.chevaux[0].numero == pari.num_cheval){
         montant = pari.argent + pari.argent * course.chevaux[0].cote;
     }
     else{
         montant = -pari.argent;
-=======
-    if(course.chevaux[0].numero == pari.num_cheval)
-    {
-	montant = pari.argent + pari.argent * course.chevaux[0].cote;
-    }
-    else
-    {
-	montant = -pari.argent;
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     }
 
    if (fichier != NULL)
     {
-<<<<<<< HEAD
         char *champ;
         fichier = fopen("user.txt", "r+");
         while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL){
@@ -676,48 +416,6 @@ void modificationArgent(Course course, Pari pari, User user){
 
     }
     else{
-=======
-	char *champ;
-	fichier = fopen("user.txt", "r+");
-	while (fgets(chaine, TAILLE_MAX_USER, fichier) != NULL)
-	{
-	    champ = strtok(chaine, "#");
-
-	    if(champ)
-    	    {
-		if(compare(login, champ) == 0 ) //Login égaux
-		{
-		    champ = strtok(NULL, "#");
-	    	    if(compare(password, champ) == 0) //Password égaux
-    	    	    {
-			champ = strtok(NULL, "#");
-			montant = atof(champ) + montant;
-        		fprintf(tmp, "%s#%s#%f\n", login, password,montant);
-    			
-		
-   	            }
-		}
-		//Autre user
-		else{
-		    strcpy(read.login,champ);
-		    champ = strtok(NULL, "#");
-		    strcpy(read.password,champ);
-		    champ = strtok(NULL, "#");
-		    montant_tmp = atof(champ);
-		    fprintf(tmp,"%s#%s#%f\n", read.login, read.password, montant_tmp);
-		}
-   	    }
-	}
-	fclose(fichier);
-	remove ("user.txt");
-	rename("tmp.txt","user.txt");
-	fclose(tmp);
-	
-	
-    }
-    else
-    {
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
         printf("Impossible d'ouvrir le fichier\n");
     }
 }
@@ -729,7 +427,6 @@ void modificationArgent(Course course, Pari pari, User user){
  *\reçoit les paris des clients, attend que tous les clients aient pariés, lance la course et renvoi le résultat.
 **/
 void* threadCourse (void *arg) {
-<<<<<<< HEAD
     Partie* partie = (Partie*) arg; //partie reçu
     Partie renvoi = *partie; //partie à renvoyer
     int longueur;
@@ -763,29 +460,8 @@ void* threadCourse (void *arg) {
             compteur++;
             printf("en attente de %d paris\n", TAILLE_MAX_CLIENTS-compteur);
         }
-=======
 
-	Partie* partie = (Partie*) arg; //partie reçu
-	Partie renvoi = *partie; //partie à renvoyer
-	int longueur;
-	Pari pari;
-	Pari paris[TAILLE_MAX_CLIENTS];
-	User user;
- 	int compteur = 0;
 
-	Course course = init();
-	//Init de la course pour les TAILLE_MAX_CLIENTS clients
-	for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        	renvoi.trames[i].course = course;
-		renvoi.trames[i].token = 1;
-    	}
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
-
-    	//Envoie init de la course aux clients
-    	for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-        	if( (write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]))) > 0){
-
-<<<<<<< HEAD
         //Renvoie de l'attente au client
         if(compteur < TAILLE_MAX_CLIENTS){
             renvoi.trames[compteur-1].token = 0;
@@ -808,54 +484,6 @@ void* threadCourse (void *arg) {
                 //Renvoie du resultat aux clients
                 write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
             }
-=======
-		}
-		else{
-	    		printf("echec lors de l'envoi de la trame\n");
-		}
-    	}
-
-    	while(1)
-    	{
-
-		//Prise en charge d'un pari -- token reçu = 1 -- token envoyé = 2 || 0
-		if (renvoi.trames[compteur].token == 1 && (longueur = read(renvoi.trames[compteur].sock, &pari, sizeof(pari))) > 0){
-	    		paris[compteur] = pari;
-	    		compteur++; 
-         		printf("en attente de %d paris\n", TAILLE_MAX_CLIENTS-compteur);
-		}
-
-
-		//Renvoie de l'attente au client
-		if(compteur < TAILLE_MAX_CLIENTS){
-	 	   	renvoi.trames[compteur-1].token = 0;
-	 	   	write(renvoi.trames[compteur-1].sock, &renvoi.trames[compteur-1], sizeof(renvoi.trames[compteur-1]));
-		}
-
-		//Debut course
-       		else if(compteur == TAILLE_MAX_CLIENTS ){
-           		printf("Tous les paris ont été reçus\n");
-
-	   		//Lancement de la course
-	    		Course resultat = lancer(renvoi.trames[0].course);
-
-    	    		for(int i = 0; i < TAILLE_MAX_CLIENTS; i++){
-               			renvoi.trames[i].course = resultat;
-	        		renvoi.trames[i].token = 2;
-
-				//Modification de l'argent des users
-	        		modificationArgent(resultat, paris[i], renvoi.trames[i].user);
-
-				//Renvoie du resultat aux clients
-				write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
-    	    		}
-
-	    		printf("Course finie, deconnexion des utilisateurs...\n");
-	    		pthread_exit(NULL);
-        	} 
-
-    	}//Fin while
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
 
             printf("Course finie, deconnexion des utilisateurs...\n");
             pthread_exit(NULL);
@@ -878,43 +506,6 @@ void* threadCompteur (void *arg) {
     int longueur;
     int thread_client = 0;
 
-<<<<<<< HEAD
-=======
-    while(1)
-    {
-	//Connexion d'un user
-    	if (renvoi.token == -1 && (longueur = read(trame->sock, &user, sizeof(user))) > 0){
-	    //Connexion
-	    if(connection(user)){
-	        printf("connexion de l'utilisateur %s\n", user.login);
-    	    }
-	    //Inscription
-	    else{
-	        inscription(user.login, user.password);
-	        printf("Inscription de l'utilisateur %s\n", user.login);
-	    }
-	renvoi.user = user;
-	trame->user = user;
-        trame->compteur++; 
-	}
-
-	//Renvoie de l'attente au client
-	if(trame->compteur < TAILLE_MAX_CLIENTS){
-	    renvoi.token = 0;
-	    renvoi.compteur = trame->compteur;
-	    write(renvoi.sock, &renvoi, sizeof(renvoi));
-	    sleep(3);
-	}
-
-	//On lance la course 
-        else{
-           printf("Tous les joueurs sont dans la partie\n");
-	   pthread_exit(NULL);
-        } 
-
-    }//Fin while
-}
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
 
     while(1){
 
@@ -969,11 +560,6 @@ int main(int argc, char **argv) {
     Trame trame;
     trame.compteur = 0;
     Partie partie;
-<<<<<<< HEAD
-=======
-    User user;
-    
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
 
 
     /* recuperation de la structure d'adresse en utilisant le nom */
@@ -990,17 +576,10 @@ int main(int argc, char **argv) {
     adresse_locale.sin_addr.s_addr	= INADDR_ANY; 			/* ou AF_INET */
     adresse_locale.sin_port = htons(5000);
 
-<<<<<<< HEAD
 
     printf("numero de port pour la connexion au serveur : %d \n",
                    ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
 
-=======
-    
-    printf("numero de port pour la connexion au serveur : %d \n", 
-		   ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
-    
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
     /* creation de la socket */
     if ((socket_descriptor = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
                 perror("erreur : impossible de creer la socket de connexion avec le client.");
@@ -1020,7 +599,6 @@ int main(int argc, char **argv) {
 
     /* attente des connexions et traitement des donnees recues */
     for(;;) {
-<<<<<<< HEAD
         longueur_adresse_courante = sizeof(adresse_client_courant);
 
         /* adresse_client_courant sera renseigné par accept via les infos du connect */
@@ -1030,51 +608,6 @@ int main(int argc, char **argv) {
             perror("erreur : impossible d'accepter la connexion avec le client.");
             exit(1);
         }
-=======
-		longueur_adresse_courante = sizeof(adresse_client_courant);
-
-		/* adresse_client_courant sera renseigné par accept via les infos du connect */
-		if ((nouv_socket_descriptor = 
-			accept(socket_descriptor, 
-			       (sockaddr*)(&adresse_client_courant),
-			       &longueur_adresse_courante))
-			 < 0) {
-			perror("erreur : impossible d'accepter la connexion avec le client.");
-			exit(1);
-		}
-
-
-
-		trame.sock = nouv_socket_descriptor;
-		pthread_t attente;
-		if (thread_client = pthread_create(&attente, NULL, threadCompteur, &trame) != 0 ){
-			printf("Erreur lors de la création du thread \n");
-			exit(1);	
-		}
-		else{
-		    pthread_join(attente, NULL);
-		    partie.trames[compteur] = trame;
-		    compteur ++;
-
-		    if(compteur%TAILLE_MAX_CLIENTS == 0){
-			pthread_t init;
-			if (thread_client = pthread_create(&init, NULL, threadCourse, &partie) != 0 ){
-				printf("Erreur lors de la création du thread \n");
-				exit(1);	
-			}
-			else{
-			    compteur = 0;
-			}
-		    }
-		}
-
-		
-
-						
-			//close(nouv_socket_descriptor);
-		
-    }
->>>>>>> 5c390bba5921710a7c03cd8f7ecb18a4e8d23551
 
         trame.sock = nouv_socket_descriptor;
         //Arrivée du client -> thread d'attente
@@ -1100,6 +633,7 @@ int main(int argc, char **argv) {
                 }
             }
         }
+        //close(nouv_socket_descriptor);
     }
     return 0;
 }
