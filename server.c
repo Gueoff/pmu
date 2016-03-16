@@ -621,23 +621,8 @@ int main(int argc, char **argv) {
     bcopy((char*)ptr_hote->h_addr, (char*)&adresse_locale.sin_addr, ptr_hote->h_length);
     adresse_locale.sin_family		= ptr_hote->h_addrtype; 	/* ou AF_INET */
     adresse_locale.sin_addr.s_addr	= INADDR_ANY; 			/* ou AF_INET */
-
-    /* 2 facons de definir le service que l'on va utiliser a distance */
-    /* (commenter l'une ou l'autre des solutions) */
-    
-    /*-----------------------------------------------------------*/
-    /* SOLUTION 1 : utiliser un service existant, par ex. "irc" */
-    /*
-    if ((ptr_service = getservbyname("irc","tcp")) == NULL) {
-		perror("erreur : impossible de recuperer le numero de port du service desire.");
-		exit(1);
-    }
-    adresse_locale.sin_port = htons(ptr_service->s_port);
-    */
-    /*-----------------------------------------------------------*/
-    /* SOLUTION 2 : utiliser un nouveau numero de port */
     adresse_locale.sin_port = htons(5000);
-    /*-----------------------------------------------------------*/
+
     
     printf("numero de port pour la connexion au serveur : %d \n", 
 		   ntohs(adresse_locale.sin_port) /*ntohs(ptr_service->s_port)*/);
@@ -675,16 +660,14 @@ int main(int argc, char **argv) {
 
 
 
-
-
 		trame.sock = nouv_socket_descriptor;
-		//trame.user = user;
 		pthread_t attente;
 		if (thread_client = pthread_create(&attente, NULL, threadCompteur, &trame) != 0 ){
 			printf("Erreur lors de la création du thread \n");
 			exit(1);	
 		}
 		else{
+		    pthread_join(attente, NULL);
 		    partie.trames[compteur] = trame;
 		    compteur ++;
 
