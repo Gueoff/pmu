@@ -67,7 +67,7 @@ void init(Course course){
 
     printf("\n   Modalités de la course\n");
     printf("---------------------------------\n");
-    printf("   numero   |   cote   |   nom   \n");
+    printf("   numero   |  cote         | nom   \n");
     printf("   %d        |  %f     | %s      \n",course.chevaux[0].numero,course.chevaux[0].cote,course.chevaux[0].nom);
     printf("   %d        |  %f     | %s      \n",course.chevaux[1].numero,course.chevaux[1].cote,course.chevaux[1].nom);
     printf("   %d        |  %f     | %s      \n",course.chevaux[2].numero,course.chevaux[2].cote,course.chevaux[2].nom);

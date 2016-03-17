@@ -20,7 +20,7 @@
 #include <time.h>
 #define TAILLE_MAX_NOM 256
 #define TAILLE_MAX_USER 256
-#define TAILLE_MAX_CLIENTS 4
+#define TAILLE_MAX_CLIENTS 2
 
 
 
@@ -483,6 +483,7 @@ void* threadCourse (void *arg) {
 
                 //Renvoie du resultat aux clients
                 write(renvoi.trames[i].sock, &renvoi.trames[i], sizeof(renvoi.trames[i]));
+		close(renvoi.trames[i].sock);
             }
 
             printf("Course finie, deconnexion des utilisateurs...\n");
@@ -507,7 +508,7 @@ void* threadCompteur (void *arg) {
     int thread_client = 0;
 
 
-    while(1){
+    //while(1){
 
         //Connexion d'un user
         if (renvoi.token == -1 && (longueur = read(trame->sock, &user, sizeof(user))) > 0){
@@ -538,7 +539,7 @@ void* threadCompteur (void *arg) {
            printf("Tous les joueurs sont dans la partie\n");
            pthread_exit(NULL);
         }
-    }
+    //}
 }
 
 
@@ -560,6 +561,7 @@ int main(int argc, char **argv) {
     Trame trame;
     trame.compteur = 0;
     Partie partie;
+    pthread_mutex_t mutex;
 
 
     /* recuperation de la structure d'adresse en utilisant le nom */
@@ -633,7 +635,6 @@ int main(int argc, char **argv) {
                 }
             }
         }
-        //close(nouv_socket_descriptor);
     }
     return 0;
 }
